@@ -1,4 +1,4 @@
-package Youtube;
+package Youtube.Data;
 
 public enum Part {
     contentDetails,
