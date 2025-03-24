@@ -1,4 +1,9 @@
-package Youtube;
+package Youtube.Data;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.web.client.RestTemplate;
+
+import java.net.URI;
 
 public class Data {
 
@@ -52,5 +57,12 @@ public class Data {
         }
 
         return res.toString();
+    }
+
+    /**Returns the root JsonNode from the URL
+     * @param uri The URL the JSON is retrieved from.*/
+    public static JsonNode getJsonFromURL(URI uri) {
+        RestTemplate restTemplate = new RestTemplate();
+        return restTemplate.getForObject(uri, JsonNode.class);
     }
 }
