@@ -1,19 +1,15 @@
 package Spotify.Data;
 
-import Youtube.Logic.TitleDescription;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.SpotifyHttpManager;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
-import se.michaelthelin.spotify.model_objects.specification.Paging;
-import se.michaelthelin.spotify.model_objects.specification.PlaylistSimplified;
 import se.michaelthelin.spotify.model_objects.specification.User;
 import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeUriRequest;
 import se.michaelthelin.spotify.requests.authorization.authorization_code.pkce.AuthorizationCodePKCERefreshRequest;
 import se.michaelthelin.spotify.requests.authorization.authorization_code.pkce.AuthorizationCodePKCERequest;
-import se.michaelthelin.spotify.requests.data.playlists.AddItemsToPlaylistRequest;
 import se.michaelthelin.spotify.requests.data.playlists.CreatePlaylistRequest;
 import se.michaelthelin.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
 
@@ -32,7 +28,7 @@ public class Login {
 
     private String userId = "";
 
-    public Login() {
+    public Login() throws IOException, ParseException, SpotifyWebApiException {
         //create the URL for requesting authorization code
         final URI uri = authorizationCodeUriRequest.execute();
         //generate random verifier code for oAuth
@@ -43,6 +39,7 @@ public class Login {
         System.out.println("Enter the response URL: ");
         Scanner scanner = new Scanner(System.in);
         URI responseURL = URI.create(scanner.nextLine());
+        scanner.close();
         //parse response url
         Map<String, String> queryMap = getQueryMap(responseURL.getQuery());
 
@@ -61,6 +58,9 @@ public class Login {
             System.out.println("Error: " + e.getMessage());
         }
 
+
+
+        getUserId();
     }
 
     private static String generateCodeVerifier() {
@@ -88,16 +88,19 @@ public class Login {
         authorizationCodePKCERefreshRequest.execute();
     }
 
-    private String createPlaylist(String name, boolean collaborative, boolean publicPrivate, String description) throws IOException, ParseException, SpotifyWebApiException {
+    public String createPlaylist(String name, boolean collaborative, boolean publicPrivate, String description) throws IOException, ParseException, SpotifyWebApiException {
         CreatePlaylistRequest createPlaylistRequest = spotifyApi.createPlaylist(userId, name).collaborative(collaborative).public_(publicPrivate).description(description).build();
         createPlaylistRequest.execute();
+
 
         List<NameValuePair> response = createPlaylistRequest.getBodyParameters();
         System.out.println(response.get(5).getName());
         return response.get(5).getValue();
     }
 
-    public String[] getSpotify
+    public String[] getSpotifyTrackURL() {
+        return null;
+    }
 
     private void getUserId() throws IOException, ParseException, SpotifyWebApiException {
         GetCurrentUsersProfileRequest getCurrentUsersProfileRequest = spotifyApi.getCurrentUsersProfile()
