@@ -96,24 +96,18 @@ public class AuthController {
         authorizationCodePKCERefreshRequest.execute();
     }
 
-    public String createPlaylist(String name, boolean collaborative, boolean publicPrivate, String description) throws IOException, ParseException, SpotifyWebApiException {
-        CreatePlaylistRequest createPlaylistRequest = spotifyApi.createPlaylist(userId, name).collaborative(collaborative).public_(publicPrivate).description(description).build();
-        createPlaylistRequest.execute();
-
-
-        List<NameValuePair> response = createPlaylistRequest.getBodyParameters();
-        System.out.println(response.get(5).getName());
-        return response.get(5).getValue();
-    }
-
-    public String[] getSpotifyTrackURL() {
-        return null;
-    }
-
-    private void getUserId() throws IOException, ParseException, SpotifyWebApiException {
+    private void getUserIdFromSpotify() throws IOException, ParseException, SpotifyWebApiException {
         GetCurrentUsersProfileRequest getCurrentUsersProfileRequest = spotifyApi.getCurrentUsersProfile()
                 .build();
         User user = getCurrentUsersProfileRequest.execute();
-        this.userId = user.getId();
+        userId = user.getId();
+    }
+
+    public static SpotifyApi getSpotifyApi() {
+        return spotifyApi;
+    }
+
+    public static String getUserId() {
+        return userId;
     }
 }
