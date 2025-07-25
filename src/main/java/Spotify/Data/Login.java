@@ -38,7 +38,7 @@ public class Login {
 
     private String userId = "";
 
-    public Login() throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public Login() {
 
         while (true) {
             try {
@@ -82,7 +82,7 @@ public class Login {
 
     public static Map<String, String> getQueryMap(String query) {
         String[] params = query.split("&");
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
 
         for (String param : params) {
             String name = param.split("=")[0];
