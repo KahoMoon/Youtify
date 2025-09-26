@@ -16,7 +16,7 @@ dependencies {
     implementation("org.springframework:spring-web:6.2.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
     testImplementation("org.mockito:mockito-core:5.16.1")
-    implementation("se.michaelthelin.spotify:spotify-web-api-java:9.1.1")
+    implementation("se.michaelthelin.spotify:spotify-web-api-java:9.3.0")
 }
 
 tasks.test {
