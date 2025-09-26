@@ -1,4 +1,4 @@
-package Spotify.Data;
+package Spotify.Authentication;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
@@ -20,7 +20,7 @@ public class OAuth {
         return codeVerifier;
     }
 
-    public static String generateCodeChallenge(String codeVerifier) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public static String generateCodeChallenge(String codeVerifier) throws NoSuchAlgorithmException {
         byte[] bytes = codeVerifier.getBytes(StandardCharsets.US_ASCII);
         MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
         messageDigest.update(bytes, 0, bytes.length);

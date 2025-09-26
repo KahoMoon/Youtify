@@ -1,6 +1,5 @@
-package Spotify.Data;
+package Spotify.Authentication;
 
-import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.SpotifyHttpManager;
@@ -10,7 +9,6 @@ import se.michaelthelin.spotify.model_objects.specification.User;
 import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeUriRequest;
 import se.michaelthelin.spotify.requests.authorization.authorization_code.pkce.AuthorizationCodePKCERefreshRequest;
 import se.michaelthelin.spotify.requests.authorization.authorization_code.pkce.AuthorizationCodePKCERequest;
-import se.michaelthelin.spotify.requests.data.playlists.CreatePlaylistRequest;
 import se.michaelthelin.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
 
 import java.io.IOException;
@@ -20,31 +18,28 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 
-public class Login {
+public class AuthController {
     private static final URI redirectUri = SpotifyHttpManager.makeUri("http://localhost:8080");
 
-    private static final SpotifyApi spotifyApi = new SpotifyApi.Builder().setClientId(Keys.CLIENT_ID.getId()).setRedirectUri(redirectUri).build();
-
-    private static String codeVerifier = null;
-    private static String codeChallenge = null;
-    private static final AuthorizationCodeUriRequest authorizationCodeUriRequest = spotifyApi
-            .authorizationCodePKCEUri(codeChallenge)
-            .scope("playlist-modify-private, playlist-modify-public")
-            .show_dialog(false)
+    private static final SpotifyApi spotifyApi = new SpotifyApi.Builder()
+            .setClientId(Keys.getId())
+            .setRedirectUri(redirectUri)
             .build();
 
-    private static String code = null;
-    private static final AuthorizationCodePKCERequest authorizationCodePKCERequest = spotifyApi.authorizationCodePKCE(code, codeVerifier).build();
+    private static String userId = "";
 
-    private String userId = "";
-
-    public Login() {
+    public AuthController() {
 
         while (true) {
             try {
                 //request authorization URL using code verifier
-                codeVerifier = OAuth.generateCodeVerifier();
-                codeChallenge = OAuth.getCodeChallenge();
+                String codeVerifier = OAuth.generateCodeVerifier();
+                String codeChallenge = OAuth.getCodeChallenge();
+                final AuthorizationCodeUriRequest authorizationCodeUriRequest = spotifyApi
+                        .authorizationCodePKCEUri(codeChallenge)
+                        .scope("playlist-modify-private, playlist-modify-public")
+                        .show_dialog(true)
+                        .build();
                 final URI authorizationUri = authorizationCodeUriRequest.execute();
 
                 //get response URL
@@ -61,26 +56,29 @@ public class Login {
                 if (queryMap.containsKey("error")) {
                     System.out.println("Error: " + queryMap.get("error"));
                     continue;
-                } else if (queryMap.containsKey("code")) {
-                    code = queryMap.get("code");
                 }
+                String code = queryMap.get("code");
 
+                final AuthorizationCodePKCERequest authorizationCodePKCERequest = spotifyApi
+                        .authorizationCodePKCE(Keys.getId(), code, codeVerifier, redirectUri)
+                        .build();
                 final AuthorizationCodeCredentials authorizationCodeCredentials = authorizationCodePKCERequest.execute();
                 spotifyApi.setAccessToken(authorizationCodeCredentials.getAccessToken());
                 spotifyApi.setRefreshToken(authorizationCodeCredentials.getRefreshToken());
 
-                System.out.println("YAY!");
-
-                break;
+                getUserIdFromSpotify();
             } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
-                //throw new RuntimeException(e);
+                throw new RuntimeException(e);
             } catch (SpotifyWebApiException | IOException | ParseException e) {
                 System.out.println("Error: " + e);
             }
+            break;
         }
+
+        System.out.println("Login Successful");
     }
 
-    public static Map<String, String> getQueryMap(String query) {
+    private static Map<String, String> getQueryMap(String query) {
         String[] params = query.split("&");
         Map<String, String> map = new HashMap<>();
 
@@ -93,29 +91,23 @@ public class Login {
     }
 
     private void refreshAccessToken() throws IOException, ParseException, SpotifyWebApiException {
-        AuthorizationCodePKCERefreshRequest authorizationCodePKCERefreshRequest = spotifyApi.authorizationCodePKCERefresh(Keys.CLIENT_ID.getId(), spotifyApi.getRefreshToken()).build();
+        AuthorizationCodePKCERefreshRequest authorizationCodePKCERefreshRequest = spotifyApi.authorizationCodePKCERefresh(Keys.getId(), spotifyApi.getRefreshToken()).build();
 
         authorizationCodePKCERefreshRequest.execute();
     }
 
-    public String createPlaylist(String name, boolean collaborative, boolean publicPrivate, String description) throws IOException, ParseException, SpotifyWebApiException {
-        CreatePlaylistRequest createPlaylistRequest = spotifyApi.createPlaylist(userId, name).collaborative(collaborative).public_(publicPrivate).description(description).build();
-        createPlaylistRequest.execute();
-
-
-        List<NameValuePair> response = createPlaylistRequest.getBodyParameters();
-        System.out.println(response.get(5).getName());
-        return response.get(5).getValue();
-    }
-
-    public String[] getSpotifyTrackURL() {
-        return null;
-    }
-
-    private void getUserId() throws IOException, ParseException, SpotifyWebApiException {
+    private void getUserIdFromSpotify() throws IOException, ParseException, SpotifyWebApiException {
         GetCurrentUsersProfileRequest getCurrentUsersProfileRequest = spotifyApi.getCurrentUsersProfile()
                 .build();
         User user = getCurrentUsersProfileRequest.execute();
-        this.userId = user.getId();
+        userId = user.getId();
+    }
+
+    public static SpotifyApi getSpotifyApi() {
+        return spotifyApi;
+    }
+
+    public static String getUserId() {
+        return userId;
     }
 }
