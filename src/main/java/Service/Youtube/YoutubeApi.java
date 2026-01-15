@@ -1,4 +1,4 @@
-package Youtube.Data;
+package Service.Youtube;
 
 public enum YoutubeApi {
     API_KEY;

@@ -1,6 +1,5 @@
-package Spotify.Data;
+package Service.Spotify;
 
-import Spotify.Authentication.AuthController;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -10,7 +9,7 @@ import se.michaelthelin.spotify.requests.data.playlists.CreatePlaylistRequest;
 import java.io.IOException;
 import java.util.List;
 
-import static Spotify.Authentication.AuthController.getUserId;
+import static Service.Spotify.AuthController.getUserId;
 
 
 public class Playlist {

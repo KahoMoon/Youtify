@@ -1,4 +1,4 @@
-package Spotify.Authentication;
+package Service.Spotify;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
