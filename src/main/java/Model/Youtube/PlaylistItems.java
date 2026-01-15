@@ -1,4 +1,4 @@
-package Youtube.Logic;
+package Model.Youtube;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

@@ -1,5 +1,7 @@
 package Youtube.Logic;
 
+import Model.Youtube.PlaylistItems;
+import Model.Youtube.TitleDescription;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;

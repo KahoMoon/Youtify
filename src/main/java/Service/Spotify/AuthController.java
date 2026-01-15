@@ -1,4 +1,4 @@
-package Spotify.Authentication;
+package Service.Spotify;
 
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.SpotifyApi;

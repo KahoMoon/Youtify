@@ -1,4 +1,4 @@
-package Youtube.Logic;
+package Model.Youtube;
 
 public class TitleDescription {
     String title;

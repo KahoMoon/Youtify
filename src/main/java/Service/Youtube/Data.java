@@ -1,4 +1,4 @@
-package Youtube.Data;
+package Service.Youtube;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.web.client.RestTemplate;
