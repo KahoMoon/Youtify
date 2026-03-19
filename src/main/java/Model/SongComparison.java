@@ -58,6 +58,13 @@ public class SongComparison {
         Set<String> yTitleSecondOriginal;
         Set<String> yTitleSecondUnhomoglyph;
 
+        YoutubeTitleSets() {
+            this.yTitleFirstOriginal = new HashSet<>();
+            this.yTitleFirstUnhomoglyph = new HashSet<>();
+            this.yTitleSecondOriginal = new HashSet<>();
+            this.yTitleSecondUnhomoglyph = new HashSet<>();
+        }
+
         YoutubeTitleSets(Set<String> yTitleFirstOriginal, Set<String> yTitleFirstUnhomoglyph, Set<String> yTitleSecondOriginal, Set<String> yTitleSecondUnhomoglyph) {
             this.yTitleFirstOriginal = yTitleFirstOriginal;
             this.yTitleFirstUnhomoglyph = yTitleFirstUnhomoglyph;
@@ -68,8 +75,8 @@ public class SongComparison {
         void combine() {
             this.yTitleFirstOriginal.addAll(this.yTitleSecondOriginal);
             this.yTitleFirstUnhomoglyph.addAll(this.yTitleSecondUnhomoglyph);
-            this.yTitleSecondOriginal = null;
-            this.yTitleSecondUnhomoglyph = null;
+            this.yTitleSecondOriginal = new HashSet<>();
+            this.yTitleSecondUnhomoglyph = new HashSet<>();
         }
 
         @Override
@@ -142,6 +149,22 @@ public class SongComparison {
 
 
         return res;
+    }
+
+    public void parseSpotifyTitle(String spotifyTitle, Set<String> spotifyTitleSet) {
+        String[] spotifyTitleSplit = spotifyTitle.split("\\s+");
+        for (String word : spotifyTitleSplit) {
+            if (word.matches("^-?\\d+$")) {
+                spotifyTitleSet.add(word.toLowerCase());
+                continue;
+            }
+            word = word.replaceFirst("^[^a-zA-Z]+", "");
+            word = word.replaceAll("[^a-zA-Z]+$", "");
+            if (word.isEmpty()) {
+                continue;
+            }
+            spotifyTitleSet.add(word.toLowerCase());
+        }
     }
 
     /**
@@ -245,6 +268,9 @@ public class SongComparison {
     public <T> double subSetPercentage(Set<T> setA, Set<T> setB) {
         if (setA.isEmpty()) {
             return 0.0;
+        }
+        if (setA.size() > setB.size()) {
+            return 0;
         }
 
         Set<T> intersection = new HashSet<>(setA);
