@@ -1,13 +1,4 @@
 package Model;
-/*
-* can compare song runtime also?
-* how to compare remixes that arent on spotify?
-*   Madeon - Pay No Mind (Kbubs Remix)
-*   plxntkid - 𝕟𝕠𝕥𝕙𝕚𝕟𝕘 𝕞𝕒𝕜𝕖𝕤 𝕞𝕖 𝕙𝕒𝕡𝕡𝕪 (ft. Ouse)
-*   ＮＯＴＨＩＮＧ 何も
-*   white shinobi 💔 - damaged w/ gin$eng*
-* */
-
 import com.anyascii.AnyAscii;
 import com.fasterxml.jackson.databind.JsonNode;
 
