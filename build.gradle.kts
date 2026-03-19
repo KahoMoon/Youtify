@@ -17,6 +17,8 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
     testImplementation("org.mockito:mockito-core:5.16.1")
     implementation("se.michaelthelin.spotify:spotify-web-api-java:9.3.0")
+    // Source: https://mvnrepository.com/artifact/com.anyascii/anyascii
+    implementation("com.anyascii:anyascii:0.3.3")
 }
 
 tasks.test {
