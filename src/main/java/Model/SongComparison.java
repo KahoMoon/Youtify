@@ -126,18 +126,33 @@ public class SongComparison {
         return true;
     }
 
-    /*
-    * @param youtubeSongJSON snippet JSON
-    * @param spotifySongJSON items JSON*/
+    /**Returns the probability that the Youtube title and Spotify title refer to the same object
+     * @return Returns probability that the Youtube JSON and Spotify JSON contain identical titles. If perfect match, returns 1.
+     * @param youtubeSongJSON "items" sub-JSON from Youtube API
+     * @param spotifySongJSON "items" sub-JSON from Spotify Data API*/
     public double checkTitle(JsonNode youtubeSongJSON, JsonNode spotifySongJSON) {
-        double res = 1.0;
+        double res = 0.0;
 
-        String sTitle = spotifySongJSON.get("name").asText();
-        Set<String> sTitleSet = new LinkedHashSet<>(Arrays.asList(sTitle.split("\\\\s+")));
+        String spotifyTitle = spotifySongJSON.get("name").asText();
+        String youtubeTitle = youtubeSongJSON.get("title").asText();
+        YoutubeTitleSets youtubeTitleSets = new YoutubeTitleSets();
+        Set<String> spotifyTitleSet = new HashSet<>();
+        parseYoutubeTitle(youtubeTitle, youtubeTitleSets);
+        parseSpotifyTitle(spotifyTitle, spotifyTitleSet);
 
-        String yTitle = youtubeSongJSON.get("title").asText();
-        LinkedHashSet<String> yTitleSet = new LinkedHashSet<>();
-
+        res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.getyTitleSecondOriginal()));
+        if (res == 1) {
+            return res;
+        }
+        res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.getyTitleSecondUnhomoglyph()));
+        if (res == 1) {
+            return res;
+        }
+        res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.getyTitleFirstOriginal()));
+        if (res == 1) {
+            return res;
+        }
+        res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.getyTitleFirstUnhomoglyph()));
 
         return res;
     }

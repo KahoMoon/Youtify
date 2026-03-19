@@ -15,10 +15,13 @@ import java.util.*;
 
 class SongComparisonTest {
 
+    @BeforeEach
+    void setUp() throws IOException {
+        boolean fileDelete = Files.deleteIfExists(Paths.get("C:\\Users\\Kaho\\IdeaProjects\\Youtify\\Youtify Redflags.txt"));
+    }
+
     @Test
     void testParseYoutubeTitle() throws IOException {
-        boolean fileDelete = Files.deleteIfExists(Paths.get("C:\\Users\\Kaho\\IdeaProjects\\Youtify\\Youtify Redflags.txt"));
-        System.out.println(fileDelete);
         Set<String> setA = new HashSet<>();
         Set<String> setAA = new HashSet<>();
         Set<String> setB = new HashSet<>();
@@ -31,15 +34,33 @@ class SongComparisonTest {
         Assertions.assertEquals(youtubeTitleSets.getyTitleFirstOriginal(), setACheck);
         Assertions.assertEquals(youtubeTitleSets.getyTitleSecondOriginal(), setBCheck);
 
-//        setA = new HashSet<>();
-//        setB = new HashSet<>();
-//        songComparison.parseYoutubeTitle("Juice WRLD - \"Legends\" (Official Audio)", youtubeTitleSets);
-//        setACheck = new HashSet<>(List.of("juice", "wrld"));
-//        setBCheck = new HashSet<>(List.of("legends", "official", "audio"));
-//        Assertions.assertEquals(setA, setACheck);
-//        Assertions.assertEquals(setB, setBCheck);
-
         songComparison.parseYoutubeTitle("グッドバイ -album version- ", new SongComparison.YoutubeTitleSets(new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>()));
     }
 
+    @Test
+    void checkTitle() throws IOException {
+        File spotifyJSONFile = new File("C:\\Users\\Kaho\\IdeaProjects\\Youtify\\src\\test\\Spotify JSON Response");
+        File youtubeJSONFile = new File("C:\\Users\\Kaho\\IdeaProjects\\Youtify\\src\\test\\Youtube JSON Response");
+
+        ObjectMapper spotifyObjectMapper = new ObjectMapper();
+        JsonNode spotifyJSONNode = spotifyObjectMapper.readTree(spotifyJSONFile).get("items");
+
+        ObjectMapper youtubeObjectMapper = new ObjectMapper();
+        JsonNode youtubeJSONNode = youtubeObjectMapper.readTree(youtubeJSONFile).get("items");
+
+        SongComparison songComparison = new SongComparison();
+        Iterator<JsonNode> spotifyJSONIterator = spotifyJSONNode.elements();
+        Iterator<JsonNode> youtubeJSONIterator = youtubeJSONNode.elements();
+        ArrayList<Double> res = new ArrayList<>();
+        while (youtubeJSONIterator.hasNext()) {
+            JsonNode youtubeSongJSON = youtubeJSONIterator.next();
+            while (spotifyJSONIterator.hasNext()) {
+                JsonNode spotifySongJSON = spotifyJSONIterator.next();
+                res.add(songComparison.checkTitle(youtubeSongJSON.get("snippet"), spotifySongJSON));
+            }
+            spotifyJSONIterator = spotifyJSONNode.elements();
+        }
+
+        Assertions.assertEquals(100, res.size());
+    }
 }
