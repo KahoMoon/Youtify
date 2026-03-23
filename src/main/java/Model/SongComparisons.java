@@ -7,10 +7,11 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.*;
 
-public class SongComparison {
+public class SongComparisons {
 
     /**Holds the separated sections of a Youtube title in its original form and an unhomoglyphed form*/
     public static class YoutubeTitleSets {
+        public boolean identified = false;
         Set<String> yTitleFirstOriginal;
         Set<String> yTitleFirstUnhomoglyph;
 
@@ -86,7 +87,7 @@ public class SongComparison {
     final String[] redFlag = {"cover", "remix", "flip", "instrumental", "live", "acoustic", "ver", "version", "mashup", "edit", "slowed", "doomer", "nightcore"};
     static double matchProbability = 1.0;
 
-    public SongComparison() {
+    public SongComparisons() {
         while (true) {
             try {
                 redflags = new File("Youtify Redflags.txt");
@@ -108,7 +109,8 @@ public class SongComparison {
 
         double res = 1.0;
 
-        res *= checkTitle(youtubeSongJSON, spotifySongJSON);
+        YoutubeTitleSets youtubeTitleSets =  new YoutubeTitleSets();
+        res *= checkTitle(youtubeSongJSON, spotifySongJSON, youtubeTitleSets);
         if (res < CONFIDENCEINTERVAL) {
             return false;
         }
@@ -130,12 +132,11 @@ public class SongComparison {
      * @return Returns probability that the Youtube JSON and Spotify JSON contain identical titles. If perfect match, returns 1.
      * @param youtubeSongJSON "items" sub-JSON from Youtube API
      * @param spotifySongJSON "items" sub-JSON from Spotify Data API*/
-    public double checkTitle(JsonNode youtubeSongJSON, JsonNode spotifySongJSON) {
+    public double checkTitle(JsonNode youtubeSongJSON, JsonNode spotifySongJSON, YoutubeTitleSets youtubeTitleSets) {
         double res = 0.0;
 
         String spotifyTitle = spotifySongJSON.get("name").asText();
         String youtubeTitle = youtubeSongJSON.get("title").asText();
-        YoutubeTitleSets youtubeTitleSets = new YoutubeTitleSets();
         Set<String> spotifyTitleSet = new HashSet<>();
         parseYoutubeTitle(youtubeTitle, youtubeTitleSets);
         parseSpotifyTitle(spotifyTitle, spotifyTitleSet);

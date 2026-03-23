@@ -3,7 +3,6 @@ package Model;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
-class SongComparisonTest {
+class SongComparisonsTest {
 
     @BeforeEach
     void setUp() throws IOException {
@@ -26,15 +25,15 @@ class SongComparisonTest {
         Set<String> setAA = new HashSet<>();
         Set<String> setB = new HashSet<>();
         Set<String> setBB = new HashSet<>();
-        SongComparison.YoutubeTitleSets youtubeTitleSets = new SongComparison.YoutubeTitleSets(setA, setAA, setB, setBB);
-        SongComparison songComparison = new SongComparison();
-        songComparison.parseYoutubeTitle("Madeon - Pay **No* Mind (Kbubs Remix)", youtubeTitleSets);
+        SongComparisons.YoutubeTitleSets youtubeTitleSets = new SongComparisons.YoutubeTitleSets(setA, setAA, setB, setBB);
+        SongComparisons songComparisons = new SongComparisons();
+        songComparisons.parseYoutubeTitle("Madeon - Pay **No* Mind (Kbubs Remix)", youtubeTitleSets);
         Set<String> setACheck = new HashSet<>(List.of("madeon"));
         Set<String> setBCheck = new HashSet<>(List.of("pay", "no", "mind", "kbubs", "remix"));
         Assertions.assertEquals(youtubeTitleSets.getyTitleFirstOriginal(), setACheck);
         Assertions.assertEquals(youtubeTitleSets.getyTitleSecondOriginal(), setBCheck);
 
-        songComparison.parseYoutubeTitle("グッドバイ -album version- ", new SongComparison.YoutubeTitleSets(new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>()));
+        songComparisons.parseYoutubeTitle("グッドバイ -album version- ", new SongComparisons.YoutubeTitleSets(new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>()));
     }
 
     @Test
@@ -48,7 +47,7 @@ class SongComparisonTest {
         ObjectMapper youtubeObjectMapper = new ObjectMapper();
         JsonNode youtubeJSONNode = youtubeObjectMapper.readTree(youtubeJSONFile).get("items");
 
-        SongComparison songComparison = new SongComparison();
+        SongComparisons songComparisons = new SongComparisons();
         Iterator<JsonNode> spotifyJSONIterator = spotifyJSONNode.elements();
         Iterator<JsonNode> youtubeJSONIterator = youtubeJSONNode.elements();
         ArrayList<Double> res = new ArrayList<>();
@@ -56,7 +55,7 @@ class SongComparisonTest {
             JsonNode youtubeSongJSON = youtubeJSONIterator.next();
             while (spotifyJSONIterator.hasNext()) {
                 JsonNode spotifySongJSON = spotifyJSONIterator.next();
-                res.add(songComparison.checkTitle(youtubeSongJSON.get("snippet"), spotifySongJSON));
+                res.add(songComparisons.checkTitle(youtubeSongJSON.get("snippet"), spotifySongJSON));
             }
             spotifyJSONIterator = spotifyJSONNode.elements();
         }
