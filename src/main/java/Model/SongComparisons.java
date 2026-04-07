@@ -103,7 +103,7 @@ public class SongComparisons {
     }
 
     //if yt title contains poster name, cancel one of them out
-    public boolean compare(JsonNode youtubeSongJSON, JsonNode spotifySongJSON) {
+    public boolean compareSong(JsonNode youtubeSongJSON, JsonNode spotifySongJSON) {
         //String[] youtubeSongInfoArr = youtubeSongInfo.split("[^\\w']+");
         //String[] youtubeSongInfoArr = youtubeSongInfo.split("[^a-zA-Z0-9]");
 
@@ -255,12 +255,16 @@ public class SongComparisons {
         return false;
     }
 
-    public double jaccardIndex(Set<String> youtubeSongInfo, Set<String> spotifySongInfo) {
-        Set<String> intersection = new HashSet<>(youtubeSongInfo);
-        intersection.retainAll(spotifySongInfo);
+    /**Returns the jaccard index of the given sets
+     * @param youtubeSongSet a set of strings that refer to the Youtube video
+     * @param spotifySongSet a set of strings that refer to the Spotify song
+     * @return the jaccard index*/
+    public double jaccardIndex(Set<String> youtubeSongSet, Set<String> spotifySongSet) {
+        Set<String> intersection = new HashSet<>(youtubeSongSet);
+        intersection.retainAll(spotifySongSet);
 
-        Set<String> union = new HashSet<>(youtubeSongInfo);
-        union.addAll(spotifySongInfo);
+        Set<String> union = new HashSet<>(youtubeSongSet);
+        union.addAll(spotifySongSet);
 
         if (union.isEmpty()) {
             return 0.0;
