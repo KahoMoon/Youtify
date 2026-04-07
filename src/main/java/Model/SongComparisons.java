@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SongComparisons {
 
@@ -156,6 +157,57 @@ public class SongComparisons {
         res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.getyTitleFirstUnhomoglyph()));
 
         return res;
+    }
+
+    public double checkTitle(String youtubeTitle, String spotifyTitle, YoutubeTitleSets youtubeTitleSets) {
+        double res = 0.0;
+
+        Set<String> spotifyTitleSet = new HashSet<>();
+        parseYoutubeTitle(youtubeTitle, youtubeTitleSets);
+        parseSpotifyTitle(spotifyTitle, spotifyTitleSet);
+
+        res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.getyTitleSecondOriginal()));
+        if (res == 1) {
+            return res;
+        }
+        res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.getyTitleSecondUnhomoglyph()));
+        if (res == 1) {
+            return res;
+        }
+        res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.getyTitleFirstOriginal()));
+        if (res == 1) {
+            return res;
+        }
+        res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.getyTitleFirstUnhomoglyph()));
+
+        return res;
+    }
+
+    /**Returns the probability that the Youtube */
+    public double checkArtist(String youtubeChannel, String spotifyArtist, final YoutubeTitleSets youtubeTitleSets) {
+        double res = 0.0;
+
+        Set<String> youtubeSet = Arrays.stream(youtubeChannel.split("\\s+")).collect(Collectors.toSet());
+        Set<String> spotifySet = Arrays.stream(spotifyArtist.split("\\s+")).collect(Collectors.toSet());
+
+        res = Math.max(res, jaccardIndex(youtubeSet, spotifySet));
+        if (res >= CONFIDENCEINTERVAL) {
+            return res;
+        }
+        res = Math.max(res, subSetPercentage(spotifySet, youtubeSet));
+        if (res >= CONFIDENCEINTERVAL) {
+            return res;
+        }
+        res = 
+
+        return res;
+    }
+
+    public double checkLength(int youtubeRuntime, int spotifyRuntime) {
+        int longer = Math.max(youtubeRuntime, spotifyRuntime);
+        int shorter = Math.min(youtubeRuntime, spotifyRuntime);
+
+        return (double) shorter / longer;
     }
 
     public void parseSpotifyTitle(String spotifyTitle, Set<String> spotifyTitleSet) {
