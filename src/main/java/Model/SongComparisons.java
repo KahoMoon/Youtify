@@ -281,10 +281,7 @@ public class SongComparisons {
         return spotifyTitleSet;
     }
 
-    /**Returns the jaccard index of the given sets
-     * @param youtubeSongSet a set of strings that refer to the Youtube video
-     * @param spotifySongSet a set of strings that refer to the Spotify song
-     * @return the jaccard index*/
+    /**Returns the Jaccard index of the given sets*/
     private static double jaccardIndex(Set<String> setA, Set<String> setB) {
         Set<String> intersection = new HashSet<>(setA);
         intersection.retainAll(setB);
@@ -299,7 +296,7 @@ public class SongComparisons {
         return (double) intersection.size() / (double) union.size();
     }
 
-    /**Returns the percentage of which setA is a subset of setB
+    /**Returns the percentage of which setA is a subset of setB as a metric between 0.0 (no intersection at all) and 1.0 (setA and setB are equal).
      * @param setA the possible subset
      * @param setB the set being compared against*/
     private static <T> double subSetPercentage(Set<T> setA, Set<T> setB) {
@@ -316,6 +313,9 @@ public class SongComparisons {
         return (double) intersection.size() / setA.size();
     }
 
+    /**
+     * Returns the Jaro-Winkler Similarity between the two strings as a score between 0.0 and 1.0
+     */
     //from GeeksForGeeks
     private static double jaro_distance(String s1, String s2) {
         // If the Strings are equal
@@ -390,6 +390,8 @@ public class SongComparisons {
                 / 3.0;
     }
 
+    /**Returns the Levenshtein Distance between the two string argument as a metric between 0.0 and 1.0
+    */
     //from GeeksForGeeks
     private static int levenshteinDistance(String str1,
                                           String str2)
