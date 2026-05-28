@@ -11,65 +11,81 @@ import java.util.stream.Collectors;
 public class SongComparisons {
 
     /**Holds the separated sections of a Youtube title in its original form and an unhomoglyphed form*/
-    public static class YoutubeTitleSets {
-        public boolean identified = false;
-        Set<String> yTitleFirstOriginal;
-        Set<String> yTitleFirstUnhomoglyph;
+    public class YoutubeTitleSets {
+        public boolean identified = false;  //flags if the seperater could be identified or not
+        Set<String> youtubeTitleSetPreSeparator;    //holds the pre-seperator set or the entire set if a separator cannot be identified
+        Set<String> youtubeTitleSetPreSeparatorUnhomoglyph;    //hold the unhomoglyphed pre-separator set or the entire set if a separator cannot be identified
+        StringBuilder youtubeTitlePreSeparator;
+        StringBuilder youtubeTitlePreSeparatorUnhomoglyph;
 
-        public Set<String> getyTitleFirstOriginal() {
-            return yTitleFirstOriginal;
-        }
+        Set<String> youtubeTitleSetPostSeparator;  //holds the post-seperator set
+        Set<String> youtubeTitleSetPostSeparatorUnhomoglyph;   //holds the unhomoglyphed post-separator set
+        StringBuilder youtubeTitlePostSeparator;
+        StringBuilder youtubeTitlePostSeparatorUnhomoglyph;
 
-        public void setyTitleFirstOriginal(Set<String> yTitleFirstOriginal) {
-            this.yTitleFirstOriginal = yTitleFirstOriginal;
-        }
+        YoutubeTitleSets(String youtubeTitle) {
+            this.youtubeTitleSetPreSeparator = new HashSet<>();
+            this.youtubeTitleSetPreSeparatorUnhomoglyph = new HashSet<>();
+            this.youtubeTitleSetPostSeparator = new HashSet<>();
+            this.youtubeTitleSetPostSeparatorUnhomoglyph = new HashSet<>();
 
-        public Set<String> getyTitleFirstUnhomoglyph() {
-            return yTitleFirstUnhomoglyph;
-        }
-
-        public void setyTitleFirstUnhomoglyph(Set<String> yTitleFirstUnhomoglyph) {
-            this.yTitleFirstUnhomoglyph = yTitleFirstUnhomoglyph;
-        }
-
-        public Set<String> getyTitleSecondOriginal() {
-            return yTitleSecondOriginal;
-        }
-
-        public void setyTitleSecondOriginal(Set<String> yTitleSecondOriginal) {
-            this.yTitleSecondOriginal = yTitleSecondOriginal;
-        }
-
-        public Set<String> getyTitleSecondUnhomoglyph() {
-            return yTitleSecondUnhomoglyph;
-        }
-
-        public void setyTitleSecondUnhomoglyph(Set<String> yTitleSecondUnhomoglyph) {
-            this.yTitleSecondUnhomoglyph = yTitleSecondUnhomoglyph;
-        }
-
-        Set<String> yTitleSecondOriginal;
-        Set<String> yTitleSecondUnhomoglyph;
-
-        YoutubeTitleSets() {
-            this.yTitleFirstOriginal = new HashSet<>();
-            this.yTitleFirstUnhomoglyph = new HashSet<>();
-            this.yTitleSecondOriginal = new HashSet<>();
-            this.yTitleSecondUnhomoglyph = new HashSet<>();
-        }
-
-        YoutubeTitleSets(Set<String> yTitleFirstOriginal, Set<String> yTitleFirstUnhomoglyph, Set<String> yTitleSecondOriginal, Set<String> yTitleSecondUnhomoglyph) {
-            this.yTitleFirstOriginal = yTitleFirstOriginal;
-            this.yTitleFirstUnhomoglyph = yTitleFirstUnhomoglyph;
-            this.yTitleSecondOriginal = yTitleSecondOriginal;
-            this.yTitleSecondUnhomoglyph = yTitleSecondUnhomoglyph;
+            parseYoutubeTitle(youtubeTitle);
         }
 
         void combine() {
-            this.yTitleFirstOriginal.addAll(this.yTitleSecondOriginal);
-            this.yTitleFirstUnhomoglyph.addAll(this.yTitleSecondUnhomoglyph);
-            this.yTitleSecondOriginal = new HashSet<>();
-            this.yTitleSecondUnhomoglyph = new HashSet<>();
+            this.youtubeTitleSetPreSeparator.addAll(this.youtubeTitleSetPostSeparator);
+            this.youtubeTitleSetPreSeparatorUnhomoglyph.addAll(this.youtubeTitleSetPostSeparatorUnhomoglyph);
+            this.youtubeTitleSetPostSeparator = new HashSet<>();
+            this.youtubeTitleSetPostSeparatorUnhomoglyph = new HashSet<>();
+        }
+
+        /**
+         * Parses Youtube title into list of words and returns index of title/artist separation
+         *
+         * @param youtubeTitle String of the Youtube title
+         * @return if true title/artist separation can be identified, false otherwise
+         */
+        public boolean parseYoutubeTitle(String youtubeTitle) {
+            String[] youtubeTitleSplit = youtubeTitle.split("\\s+");
+            int dashCount = 0;
+            for (String word : youtubeTitleSplit) {
+                if (word.equals("-") || word.equals("—") || word.equals("~")) {
+                    dashCount++;
+                    continue;
+                }
+
+                word = word.replaceFirst("^[^a-zA-Z]+", "");    //removes non-alphabetic character at start of word
+                word = word.replaceAll("[^a-zA-Z]+$", "");  //removes non-alphabetic characters at end of word
+
+                if (word.isBlank()) {
+                    continue;
+                }
+
+                if (dashCount < 1) {
+                    word = word.toLowerCase();
+                    this.youtubeTitleSetPreSeparator.add(word);
+                    assert this.youtubeTitlePreSeparator != null;
+                    this.youtubeTitlePreSeparator.append(word);
+                    this.youtubeTitleSetPreSeparatorUnhomoglyph.add(AnyAscii.transliterate(word));
+                    assert this.youtubeTitlePreSeparatorUnhomoglyph != null;
+                    this.youtubeTitlePreSeparatorUnhomoglyph.append(word);
+                } else {
+                    word = word.toLowerCase();
+                    this.youtubeTitleSetPostSeparator.add(word);
+                    this.youtubeTitlePostSeparator.append(word);
+                    this.youtubeTitleSetPostSeparatorUnhomoglyph.add(word);
+                    assert this.youtubeTitlePostSeparatorUnhomoglyph != null;
+                    this.youtubeTitlePostSeparatorUnhomoglyph.append(word);
+                }
+            }
+
+            if (dashCount == 1) {
+                identified = true;
+                return true;
+            }
+
+            this.combine();
+            return false;
         }
 
         @Override
@@ -77,7 +93,7 @@ public class SongComparisons {
             if (o == null || getClass() != o.getClass()) return false;
 
             YoutubeTitleSets that = (YoutubeTitleSets) o;
-            return yTitleFirstOriginal.equals(that.yTitleFirstOriginal) && yTitleFirstUnhomoglyph.equals(that.yTitleFirstUnhomoglyph) && yTitleSecondOriginal.equals(that.yTitleSecondOriginal) && yTitleSecondUnhomoglyph.equals(that.yTitleSecondUnhomoglyph);
+            return youtubeTitleSetPreSeparator.equals(that.youtubeTitleSetPreSeparator) && youtubeTitleSetPreSeparatorUnhomoglyph.equals(that.youtubeTitleSetPreSeparatorUnhomoglyph) && youtubeTitleSetPostSeparator.equals(that.youtubeTitleSetPostSeparator) && youtubeTitleSetPostSeparatorUnhomoglyph.equals(that.youtubeTitleSetPostSeparatorUnhomoglyph);
         }
     }
 
@@ -129,56 +145,23 @@ public class SongComparisons {
         return true;
     }
 
-    /**Returns the probability that the Youtube title and Spotify title refer to the same object
-     * @return Returns probability that the Youtube JSON and Spotify JSON contain identical titles. If perfect match, returns 1.
-     * @param youtubeSongJSON "items" sub-JSON from Youtube API
-     * @param spotifySongJSON "items" sub-JSON from Spotify Data API*/
-    public double checkTitle(JsonNode youtubeSongJSON, JsonNode spotifySongJSON, YoutubeTitleSets youtubeTitleSets) {
+    private double checkTitle(String youtubeTitle, String spotifyTitle) {
         double res = 0.0;
 
-        String spotifyTitle = spotifySongJSON.get("name").asText();
-        String youtubeTitle = youtubeSongJSON.get("title").asText();
-        Set<String> spotifyTitleSet = new HashSet<>();
-        parseYoutubeTitle(youtubeTitle, youtubeTitleSets);
-        parseSpotifyTitle(spotifyTitle, spotifyTitleSet);
+        Set<String> spotifyTitleSet = parseSpotifyTitle(spotifyTitle);
+        YoutubeTitleSets youtubeTitleSets = new YoutubeTitleSets(youtubeTitle);
 
-        res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.getyTitleSecondOriginal()));
-        if (res == 1) {
-            return res;
-        }
-        res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.getyTitleSecondUnhomoglyph()));
-        if (res == 1) {
-            return res;
-        }
-        res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.getyTitleFirstOriginal()));
-        if (res == 1) {
-            return res;
-        }
-        res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.getyTitleFirstUnhomoglyph()));
+        res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.youtubeTitleSetPostSeparator));
+        res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.youtubeTitleSetPostSeparatorUnhomoglyph));
+        res = Math.max(res, jaccardIndex(spotifyTitleSet, youtubeTitleSets.youtubeTitleSetPostSeparator));
+        res = Math.max(res, jaccardIndex(spotifyTitleSet, youtubeTitleSets.youtubeTitleSetPostSeparatorUnhomoglyph));
 
-        return res;
-    }
-
-    public double checkTitle(String youtubeTitle, String spotifyTitle, YoutubeTitleSets youtubeTitleSets) {
-        double res = 0.0;
-
-        Set<String> spotifyTitleSet = new HashSet<>();
-        parseYoutubeTitle(youtubeTitle, youtubeTitleSets);
-        parseSpotifyTitle(spotifyTitle, spotifyTitleSet);
-
-        res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.getyTitleSecondOriginal()));
-        if (res == 1) {
-            return res;
+        if (res < CONFIDENCEINTERVAL) {
+            res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.youtubeTitleSetPreSeparator));
+            res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.youtubeTitleSetPreSeparatorUnhomoglyph));
+            res = Math.max(res, jaccardIndex(spotifyTitleSet, youtubeTitleSets.youtubeTitleSetPreSeparator));
+            res = Math.max(res, jaccardIndex(spotifyTitleSet, youtubeTitleSets.youtubeTitleSetPreSeparatorUnhomoglyph));
         }
-        res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.getyTitleSecondUnhomoglyph()));
-        if (res == 1) {
-            return res;
-        }
-        res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.getyTitleFirstOriginal()));
-        if (res == 1) {
-            return res;
-        }
-        res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.getyTitleFirstUnhomoglyph()));
 
         return res;
     }
@@ -187,18 +170,43 @@ public class SongComparisons {
     public double checkArtist(String youtubeChannel, String spotifyArtist, final YoutubeTitleSets youtubeTitleSets) {
         double res = 0.0;
 
-        Set<String> youtubeSet = Arrays.stream(youtubeChannel.split("\\s+")).collect(Collectors.toSet());
-        Set<String> spotifySet = Arrays.stream(spotifyArtist.split("\\s+")).collect(Collectors.toSet());
+        if (youtubeTitleSets.identified) {
+            String youtubeTitlePreSeparatorToString = youtubeTitleSets.youtubeTitlePreSeparator.toString();
+            res = Math.max(res, jaro_distance(spotifyArtist, youtubeTitlePreSeparatorToString));
 
-        res = Math.max(res, jaccardIndex(youtubeSet, spotifySet));
-        if (res >= CONFIDENCEINTERVAL) {
-            return res;
+            String youtubeTitlePreSeparatorUnhomoglyphToString = youtubeTitleSets.youtubeTitlePreSeparatorUnhomoglyph.toString();
+            if (res < CONFIDENCEINTERVAL) {
+                res = Math.max(res, jaro_distance(spotifyArtist, youtubeTitlePreSeparatorUnhomoglyphToString));
+            }
+
+            if (res < CONFIDENCEINTERVAL) {
+                res = Math.max(res, levenshteinDistance(spotifyArtist, youtubeTitlePreSeparatorToString));
+            }
+
+            if (res < CONFIDENCEINTERVAL) {
+                res = Math.max(res, levenshteinDistance(spotifyArtist, youtubeTitlePreSeparatorUnhomoglyphToString));
+            }
         }
-        res = Math.max(res, subSetPercentage(spotifySet, youtubeSet));
-        if (res >= CONFIDENCEINTERVAL) {
-            return res;
+
+        if (!youtubeTitleSets.identified || res < CONFIDENCEINTERVAL) {
+            Set<String> youtubeSet = Arrays.stream(youtubeChannel.split("\\s+")).collect(Collectors.toSet());
+            Set<String> spotifySet = Arrays.stream(spotifyArtist.split("\\s+")).collect(Collectors.toSet());
+
+            res = Math.max(res, subSetPercentage(spotifySet, youtubeTitleSets.youtubeTitleSetPreSeparator));
+            res = Math.max(res, subSetPercentage(spotifySet, youtubeTitleSets.youtubeTitleSetPreSeparatorUnhomoglyph));
+            res = Math.max(res, subSetPercentage(spotifySet, youtubeTitleSets.youtubeTitleSetPostSeparator));
+            res = Math.max(res, subSetPercentage(spotifySet, youtubeTitleSets.youtubeTitleSetPostSeparatorUnhomoglyph));
+
+
+            if (res < CONFIDENCEINTERVAL) {
+                res = Math.max(res, jaccardIndex(spotifySet, youtubeTitleSets.youtubeTitleSetPreSeparator));
+                res = Math.max(res, jaccardIndex(spotifySet, youtubeTitleSets.youtubeTitleSetPreSeparatorUnhomoglyph));
+                res = Math.max(res, jaccardIndex(spotifySet, youtubeTitleSets.youtubeTitleSetPostSeparator));
+                res = Math.max(res, jaccardIndex(spotifySet, youtubeTitleSets.youtubeTitleSetPostSeparatorUnhomoglyph));
+                res = Math.max(res, jaccardIndex(spotifySet, youtubeSet));
+                res = Math.max(res, subSetPercentage(spotifySet, youtubeSet));
+            }
         }
-        res = 
 
         return res;
     }
