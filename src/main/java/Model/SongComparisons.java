@@ -218,7 +218,8 @@ public class SongComparisons {
         return (double) shorter / longer;
     }
 
-    public void parseSpotifyTitle(String spotifyTitle, Set<String> spotifyTitleSet) {
+    public Set<String> parseSpotifyTitle(String spotifyTitle) {
+        Set<String> spotifyTitleSet = new HashSet<>();
         String[] spotifyTitleSplit = spotifyTitle.split("\\s+");
         for (String word : spotifyTitleSplit) {
             if (word.matches("^-?\\d+$")) {
@@ -277,42 +278,7 @@ public class SongComparisons {
         return pastDash;
     }
 
-    /**
-     * Parses Youtube title into list of words and returns index of title/artist separation
-     *
-     * @param youtubeTitle String of the Youtube title
-     * @param yTitle Holds an object which contains sets of words pre- and post- dash in both its alphanumeric and unhomoglyphed variations
-     * @return if true title/artist separation can be identified, false otherwise
-     */
-    public boolean parseYoutubeTitle(String youtubeTitle, YoutubeTitleSets yTitle) {
-        String[] youtubeTitleSplit = youtubeTitle.split("\\s+");
-        int dashCount = 0;
-        for (String word : youtubeTitleSplit) {
-            if (word.equals("-") || word.equals("—") || word.equals("~")) {
-                dashCount++;
-                continue;
-            }
-
-            word = word.replaceFirst("^[^a-zA-Z]+", "");
-            word = word.replaceAll("[^a-zA-Z]+$", "");
-
-            if (dashCount < 1) {
-                word = word.toLowerCase();
-                yTitle.getyTitleFirstOriginal().add(word);
-                yTitle.getyTitleFirstUnhomoglyph().add(AnyAscii.transliterate(word));
-            } else {
-                word = word.toLowerCase();
-                yTitle.getyTitleSecondOriginal().add(word);
-                yTitle.getyTitleSecondUnhomoglyph().add(word);
-            }
-        }
-
-        if (dashCount == 1) {
-            return true;
-        }
-
-        yTitle.combine();
-        return false;
+        return spotifyTitleSet;
     }
 
     /**Returns the jaccard index of the given sets
