@@ -43,9 +43,8 @@ public class SongComparisons {
          * Parses Youtube title into list of words and returns index of title/artist separation
          *
          * @param youtubeTitle String of the Youtube title
-         * @return if true title/artist separation can be identified, false otherwise
          */
-        public boolean parseYoutubeTitle(String youtubeTitle) {
+        private void parseYoutubeTitle(String youtubeTitle) {
             String[] youtubeTitleSplit = youtubeTitle.split("\\s+");
             int dashCount = 0;
             for (String word : youtubeTitleSplit) {
@@ -166,8 +165,8 @@ public class SongComparisons {
         return res;
     }
 
-    /**Returns the probability that the Youtube */
-    public double checkArtist(String youtubeChannel, String spotifyArtist, final YoutubeTitleSets youtubeTitleSets) {
+    /**Returns the probability that the Youtube channel refers to the Spotify artist*/
+    private double checkArtist(String youtubeChannel, String spotifyArtist, @NotNull YoutubeTitleSets youtubeTitleSets) {
         double res = 0.0;
 
         if (youtubeTitleSets.identified) {
@@ -211,14 +210,14 @@ public class SongComparisons {
         return res;
     }
 
-    public double checkLength(int youtubeRuntime, int spotifyRuntime) {
+    private double checkLength(int youtubeRuntime, int spotifyRuntime) {
         int longer = Math.max(youtubeRuntime, spotifyRuntime);
         int shorter = Math.min(youtubeRuntime, spotifyRuntime);
 
         return (double) shorter / longer;
     }
 
-    public Set<String> parseSpotifyTitle(String spotifyTitle) {
+    private Set<String> parseSpotifyTitle(String spotifyTitle) {
         Set<String> spotifyTitleSet = new HashSet<>();
         String[] spotifyTitleSplit = spotifyTitle.split("\\s+");
         for (String word : spotifyTitleSplit) {
