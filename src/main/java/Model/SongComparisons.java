@@ -23,6 +23,13 @@ public class SongComparisons {
         StringBuilder youtubeTitlePostSeparator;
         StringBuilder youtubeTitlePostSeparatorUnhomoglyph;
 
+        YoutubeTitleSets() {
+            this.youtubeTitleSetPreSeparator = new HashSet<>();
+            this.youtubeTitleSetPreSeparatorUnhomoglyph = new HashSet<>();
+            this.youtubeTitleSetPostSeparator = new HashSet<>();
+            this.youtubeTitleSetPostSeparatorUnhomoglyph = new HashSet<>();
+        }
+
         YoutubeTitleSets(String youtubeTitle) {
             this.youtubeTitleSetPreSeparator = new HashSet<>();
             this.youtubeTitleSetPreSeparatorUnhomoglyph = new HashSet<>();
