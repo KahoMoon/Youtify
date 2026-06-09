@@ -87,7 +87,7 @@ public class SongComparisons {
 
             if (dashCount == 1) {
                 identified = true;
-                return true;
+                return;
             }
 
             this.combine();
