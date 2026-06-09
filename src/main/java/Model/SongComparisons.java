@@ -91,6 +91,15 @@ public class SongComparisons {
             }
 
             this.combine();
+        }
+
+        public boolean hasRedFlag() {
+            for (String word : redFlagWords) {
+                if (youtubeTitleSetPreSeparator.contains(word) || youtubeTitleSetPreSeparatorUnhomoglyph.contains(word) || youtubeTitleSetPostSeparator.contains(word) || youtubeTitleSetPostSeparatorUnhomoglyph.contains(word)) {
+                    return true;
+                }
+            }
+
             return false;
         }
 
@@ -103,18 +112,19 @@ public class SongComparisons {
         }
     }
 
-    File redflags;
-    int CONFIDENCEINTERVAL = 8;
-
-    //RED FLAG ANY YOUTUBE VIDEO THAT IS LONGER THAN 5 minutes
-    final String[] redFlag = {"cover", "remix", "flip", "instrumental", "live", "acoustic", "ver", "version", "mashup", "edit", "slowed", "doomer", "nightcore"};
-    static double matchProbability = 1.0;
+    File redFlags;
+    File greenFlags;
+    final double CONFIDENCEINTERVAL = 0.8;
+    final Set<String> redFlagWords = new HashSet<>(Arrays.asList("cover", "remix", "flip", "instrumental", "live", "acoustic", "ver", "version", "mashup", "edit", "slowed", "doomer", "nightcore"));
+    final int redFlagLength = 300;
+    final double matchProbability = 1.0;
+    int checkArtistLimit = 2;   //the max number of artists that will be compared between the YouTube and Spotify tracks
 
     public SongComparisons() {
         while (true) {
             try {
-                redflags = new File("Youtify Redflags.txt");
-                if (redflags.createNewFile()) {
+                redFlags = new File("Youtify Redflags.txt");
+                if (redFlags.createNewFile()) {
                     break;
                 }
             } catch (FileAlreadyExistsException e) {
