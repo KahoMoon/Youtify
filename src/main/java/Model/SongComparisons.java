@@ -151,19 +151,15 @@ public class SongComparisons {
         return titleSimilarity * artistSimilarity * lengthSimilarity;
     }
 
-        //res *= checkLength(JsonNode youtubeSongJSON, JsonNode spotifySongJSON);
-        if (res < CONFIDENCEINTERVAL) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private double checkTitle(String youtubeTitle, String spotifyTitle) {
+    private double checkTitle(String youtubeTitle, String spotifyTitle, @NotNull YoutubeTitleSets youtubeTitleSets) {
         double res = 0.0;
 
         Set<String> spotifyTitleSet = parseSpotifyTitle(spotifyTitle);
-        YoutubeTitleSets youtubeTitleSets = new YoutubeTitleSets(youtubeTitle);
+        youtubeTitleSets = new YoutubeTitleSets(youtubeTitle);
+
+        if (youtubeTitleSets.hasRedFlag()) {
+            return 0.0;
+        }
 
         res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.youtubeTitleSetPostSeparator));
         res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.youtubeTitleSetPostSeparatorUnhomoglyph));
