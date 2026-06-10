@@ -3,6 +3,7 @@ import com.anyascii.AnyAscii;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.*;
@@ -142,13 +143,29 @@ public class SongComparisons {
      * @param spotifySongLen length of the Spotify song in seconds
      * @return the probability the YouTube video and Spotify song refer to the same entity as a number between 0 and 1.
      */
-    public double compareSong(String youtubeSongTitle, String spotifySongTitle, String youtubeChannel, String spotifyArtist, int youtubeSongLen, int spotifySongLen) {
+    public double compareSong(String youtubeSongTitle, String spotifySongTitle, String youtubeChannel, String spotifyArtist, int youtubeSongLen, int spotifySongLen) throws IOException {
         YoutubeTitleSets youtubeTitleSets = new YoutubeTitleSets();
         double titleSimilarity = checkTitle(youtubeSongTitle, spotifySongTitle, youtubeTitleSets);
         double artistSimilarity = checkArtist(youtubeChannel, spotifyArtist, youtubeTitleSets);
         double lengthSimilarity = checkLength(youtubeSongLen, spotifySongLen);
 
-        return titleSimilarity * artistSimilarity * lengthSimilarity;
+        double res = titleSimilarity * artistSimilarity * lengthSimilarity;
+
+        FileWriter myWriter;
+        if (res >= CONFIDENCEINTERVAL) {
+            myWriter = new FileWriter(greenFlags, true);
+            myWriter.write(youtubeSongTitle + "\n" +
+                    youtubeChannel + "\n" +
+                    youtubeSongLen + "\n");
+        } else {
+            myWriter = new FileWriter(redFlags, true);
+            myWriter.write(youtubeSongTitle + "\n" +
+                    youtubeChannel + "\n" +
+                    youtubeSongLen + "\n");
+        }
+        myWriter.close();
+
+        return res;
     }
 
     private double checkTitle(String youtubeTitle, String spotifyTitle, @NotNull YoutubeTitleSets youtubeTitleSets) {
