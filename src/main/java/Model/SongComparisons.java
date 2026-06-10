@@ -135,23 +135,21 @@ public class SongComparisons {
         }
     }
 
-    //if yt title contains poster name, cancel one of them out
-    public boolean compareSong(JsonNode youtubeSongJSON, JsonNode spotifySongJSON) {
-        //String[] youtubeSongInfoArr = youtubeSongInfo.split("[^\\w']+");
-        //String[] youtubeSongInfoArr = youtubeSongInfo.split("[^a-zA-Z0-9]");
+    /**Compares the similarity between a YouTube video and Spotify song
+     * @param youtubeSongTitle title of the YouTube video
+     * @param spotifySongTitle title of the track on Spotify
+     * @param youtubeSongLen length of the YouTube video in seconds
+     * @param spotifySongLen length of the Spotify song in seconds
+     * @return the probability the YouTube video and Spotify song refer to the same entity as a number between 0 and 1.
+     */
+    public double compareSong(String youtubeSongTitle, String spotifySongTitle, String youtubeChannel, String spotifyArtist, int youtubeSongLen, int spotifySongLen) {
+        YoutubeTitleSets youtubeTitleSets = new YoutubeTitleSets();
+        double titleSimilarity = checkTitle(youtubeSongTitle, spotifySongTitle, youtubeTitleSets);
+        double artistSimilarity = checkArtist(youtubeChannel, spotifyArtist, youtubeTitleSets);
+        double lengthSimilarity = checkLength(youtubeSongLen, spotifySongLen);
 
-        double res = 1.0;
-
-        YoutubeTitleSets youtubeTitleSets =  new YoutubeTitleSets();
-        res *= checkTitle(youtubeSongJSON, spotifySongJSON, youtubeTitleSets);
-        if (res < CONFIDENCEINTERVAL) {
-            return false;
-        }
-
-        //res *= checkArtist(JsonNode youtubeSongJSON, JsonNode spotifySongJSON);
-        if (res < CONFIDENCEINTERVAL) {
-            return false;
-        }
+        return titleSimilarity * artistSimilarity * lengthSimilarity;
+    }
 
         //res *= checkLength(JsonNode youtubeSongJSON, JsonNode spotifySongJSON);
         if (res < CONFIDENCEINTERVAL) {
