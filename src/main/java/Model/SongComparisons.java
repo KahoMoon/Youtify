@@ -249,50 +249,6 @@ public class SongComparisons {
             }
             spotifyTitleSet.add(word.toLowerCase());
         }
-    }
-
-    /**
-     * Parses Youtube title into list of words and returns index of title/artist separation
-     *
-     * @param youtubeTitle String of the Youtube title
-     * @param yTitleFirst  Will contain the first half or all the string from youtubeTitle, depending on if the title/artist separator can be identified
-     * @param yTitleSecond Will contains the remaining strings from youtubeTitle, null otherwise
-     * @return if true title/artist can be identified, false otherwise
-     */
-    public boolean parseYoutubeTitleOld(String youtubeTitle, YoutubeTitleSets yTitle) {
-        boolean pastDash = false;
-        StringBuilder word = new StringBuilder();
-        int i = 0;
-        while (i < youtubeTitle.length()) {
-            char c = youtubeTitle.charAt(i);
-            if (c == '-' || c == '—' || c == '~') {
-                pastDash = true;
-            } else if (!word.isEmpty() && (Character.isWhitespace(c) || i == youtubeTitle.length() - 1)) {
-                String temp = word.toString().replaceAll("\\p{Punct}+$", "");
-                if (!pastDash) {
-                    yTitle.getyTitleFirstOriginal().add(temp);
-                    yTitle.getyTitleFirstUnhomoglyph().add(AnyAscii.transliterate(temp));
-                } else {
-                    yTitle.getyTitleSecondOriginal().add(temp);
-                    yTitle.getyTitleSecondUnhomoglyph().add(AnyAscii.transliterate(temp));
-                }
-
-                word = new StringBuilder();
-            } else {
-                if (!Character.isLetterOrDigit(c)) {
-                    i++;
-                    continue;
-                }
-
-                word.append(Character.toLowerCase(c));
-            }
-
-            i++;
-        }
-
-
-        return pastDash;
-    }
 
         return spotifyTitleSet;
     }
