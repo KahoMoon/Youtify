@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -122,18 +123,8 @@ public class SongComparisons {
     int checkArtistLimit = 2;   //the max number of artists that will be compared between the YouTube and Spotify tracks
 
     public SongComparisons() {
-        while (true) {
-            try {
-                redFlags = new File("Youtify Redflags.txt");
-                if (redFlags.createNewFile()) {
-                    break;
-                }
-            } catch (FileAlreadyExistsException e) {
-                System.out.println("The file already exists.");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        redFlags = new File("Youtify RedFlags" + Instant.now() + ".txt");
+        greenFlags = new File("Youtify GreenFlags" + Instant.now() + ".txt");
     }
 
     /**Compares the similarity between a YouTube video and Spotify song
