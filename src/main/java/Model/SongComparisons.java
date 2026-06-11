@@ -12,18 +12,18 @@ import java.util.stream.Collectors;
 
 public class SongComparisons {
 
-    /**Holds the separated sections of a Youtube title in its original form and an unhomoglyphed form*/
+    /**Holds the separated sections of a YouTube title in its original form and an unhomoglyphed form*/
     public class YoutubeTitleSets {
-        public boolean identified = false;  //flags if the seperater could be identified or not
-        Set<String> youtubeTitleSetPreSeparator;    //holds the pre-seperator set or the entire set if a separator cannot be identified
-        Set<String> youtubeTitleSetPreSeparatorUnhomoglyph;    //hold the unhomoglyphed pre-separator set or the entire set if a separator cannot be identified
-        StringBuilder youtubeTitlePreSeparator;
-        StringBuilder youtubeTitlePreSeparatorUnhomoglyph;
+        public boolean identified = false;  //flags if the separate could be identified or not
+        Set<String> youtubeTitleSetPreSeparator;    //holds the pre-separator set or the entire set if a separator cannot be identified
+        Set<String> youtubeTitleSetPreSeparatorUnhomoglyph;    //holds the unhomoglyphed pre-separator set or the entire set if a separator cannot be identified
+        StringBuilder youtubeTitlePreSeparator; //holds the pre-separator title
+        StringBuilder youtubeTitlePreSeparatorUnhomoglyph;  //holds the unhomoglyphed pre-separator title
 
-        Set<String> youtubeTitleSetPostSeparator;  //holds the post-seperator set
+        Set<String> youtubeTitleSetPostSeparator;  //holds the post-separator set
         Set<String> youtubeTitleSetPostSeparatorUnhomoglyph;   //holds the unhomoglyphed post-separator set
-        StringBuilder youtubeTitlePostSeparator;
-        StringBuilder youtubeTitlePostSeparatorUnhomoglyph;
+        StringBuilder youtubeTitlePostSeparator;    //holds the post-separator title
+        StringBuilder youtubeTitlePostSeparatorUnhomoglyph; //holds the unhomoglyphed post-separator title
 
         YoutubeTitleSets() {
             this.youtubeTitleSetPreSeparator = new HashSet<>();
@@ -41,6 +41,9 @@ public class SongComparisons {
             parseYoutubeTitle(youtubeTitle);
         }
 
+        /**
+         * Merges post-separator objects with their pre-separator counterparts and removes them
+         */
         void combine() {
             this.youtubeTitleSetPreSeparator.addAll(this.youtubeTitleSetPostSeparator);
             this.youtubeTitleSetPreSeparatorUnhomoglyph.addAll(this.youtubeTitleSetPostSeparatorUnhomoglyph);
@@ -49,9 +52,8 @@ public class SongComparisons {
         }
 
         /**
-         * Parses Youtube title into list of words and returns index of title/artist separation
-         *
-         * @param youtubeTitle String of the Youtube title
+         * Parses YouTube title into a StringBuilder and set of its pre- and post-words in both its homoglyphed and unhomoglyphed forms
+         * @param youtubeTitle String of the YouTube title
          */
         private void parseYoutubeTitle(String youtubeTitle) {
             String[] youtubeTitleSplit = youtubeTitle.split("\\s+");
@@ -95,8 +97,12 @@ public class SongComparisons {
             this.combine();
         }
 
+        /**
+         * Checks the title for any red flag words
+         * @return returns true if the title contains any red flag words
+         */
         public boolean hasRedFlag() {
-            for (String word : redFlagWords) {
+            for (String word : RED_FLAG_WORDS) {
                 if (youtubeTitleSetPreSeparator.contains(word) || youtubeTitleSetPreSeparatorUnhomoglyph.contains(word) || youtubeTitleSetPostSeparator.contains(word) || youtubeTitleSetPostSeparatorUnhomoglyph.contains(word)) {
                     return true;
                 }
@@ -114,25 +120,26 @@ public class SongComparisons {
         }
     }
 
-    File redFlags;
-    File greenFlags;
-    final double CONFIDENCEINTERVAL = 0.8;
-    final Set<String> redFlagWords = new HashSet<>(Arrays.asList("cover", "remix", "flip", "instrumental", "live", "acoustic", "ver", "version", "mashup", "edit", "slowed", "doomer", "nightcore"));
-    final int redFlagLength = 300;
-    final double matchProbability = 1.0;
-    int checkArtistLimit = 2;   //the max number of artists that will be compared between the YouTube and Spotify tracks
+    File RED_FLAG;
+    File GREEN_FLAG;
+    final double CONFIDENCE_INTERVAL = 0.8;
+    final Set<String> RED_FLAG_WORDS = new HashSet<>(Arrays.asList("cover", "remix", "flip", "instrumental", "live", "acoustic", "ver", "version", "mashup", "edit", "slowed", "doomer", "nightcore"));
+    final int RED_FLAG_LENGTH = 300;
+    final double MATCH_PROBABILITY = 1.0;
+    int CHECK_ARTIST_LIMIT = 2;   //the max number of artists that will be compared between the YouTube and Spotify tracks
 
     public SongComparisons() {
-        redFlags = new File("Youtify RedFlags" + Instant.now() + ".txt");
-        greenFlags = new File("Youtify GreenFlags" + Instant.now() + ".txt");
+        RED_FLAG = new File("Youtify RedFlags" + Instant.now() + ".txt");
+        GREEN_FLAG = new File("Youtify GreenFlags" + Instant.now() + ".txt");
     }
 
-    /**Compares the similarity between a YouTube video and Spotify song
+    /**
+     * Compares the similarity between a YouTube video and Spotify song
      * @param youtubeSongTitle title of the YouTube video
      * @param spotifySongTitle title of the track on Spotify
      * @param youtubeSongLen length of the YouTube video in seconds
      * @param spotifySongLen length of the Spotify song in seconds
-     * @return the probability the YouTube video and Spotify song refer to the same entity as a number between 0 and 1.
+     * @return the probability the YouTube video and Spotify song refer to the same entity as a number between 0 and 1
      */
     public double compareSong(String youtubeSongTitle, String spotifySongTitle, String youtubeChannel, String spotifyArtist, int youtubeSongLen, int spotifySongLen) throws IOException {
         YoutubeTitleSets youtubeTitleSets = new YoutubeTitleSets();
@@ -143,13 +150,13 @@ public class SongComparisons {
         double res = titleSimilarity * artistSimilarity * lengthSimilarity;
 
         FileWriter myWriter;
-        if (res >= CONFIDENCEINTERVAL) {
-            myWriter = new FileWriter(greenFlags, true);
+        if (res >= CONFIDENCE_INTERVAL) {
+            myWriter = new FileWriter(GREEN_FLAG, true);
             myWriter.write(youtubeSongTitle + "\n" +
                     youtubeChannel + "\n" +
                     youtubeSongLen + "\n");
         } else {
-            myWriter = new FileWriter(redFlags, true);
+            myWriter = new FileWriter(RED_FLAG, true);
             myWriter.write(youtubeSongTitle + "\n" +
                     youtubeChannel + "\n" +
                     youtubeSongLen + "\n");
@@ -159,6 +166,13 @@ public class SongComparisons {
         return res;
     }
 
+    /**
+     * Parses and compares the YouTube title against the Spotify title
+     * @param youtubeTitle title of the YouTube video
+     * @param spotifyTitle title of the Spotify track
+     * @param youtubeTitleSets object holding the parsed YouTube title
+     * @return the probability the YouTube title and Spotify title refer to the same entity as a number between 0 and 1
+     */
     private double checkTitle(String youtubeTitle, String spotifyTitle, @NotNull YoutubeTitleSets youtubeTitleSets) {
         double res = 0.0;
 
@@ -174,7 +188,7 @@ public class SongComparisons {
         res = Math.max(res, jaccardIndex(spotifyTitleSet, youtubeTitleSets.youtubeTitleSetPostSeparator));
         res = Math.max(res, jaccardIndex(spotifyTitleSet, youtubeTitleSets.youtubeTitleSetPostSeparatorUnhomoglyph));
 
-        if (res < CONFIDENCEINTERVAL) {
+        if (res < CONFIDENCE_INTERVAL) {
             res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.youtubeTitleSetPreSeparator));
             res = Math.max(res, subSetPercentage(spotifyTitleSet, youtubeTitleSets.youtubeTitleSetPreSeparatorUnhomoglyph));
             res = Math.max(res, jaccardIndex(spotifyTitleSet, youtubeTitleSets.youtubeTitleSetPreSeparator));
@@ -184,7 +198,13 @@ public class SongComparisons {
         return res;
     }
 
-    /**Returns the probability that the Youtube channel refers to the Spotify artist*/
+    /**
+     * Compares the YouTube channel name against the Spotify artist name
+     * @param youtubeChannel name of the YouTube channel
+     * @param spotifyArtist name of the Spotify artist
+     * @param youtubeTitleSets object holding a parsed YouTube title
+     * @return the probability the YouTube channel refers to the Spotify artist as a number between 0 and 1
+     */
     private double checkArtist(String youtubeChannel, String spotifyArtist, @NotNull YoutubeTitleSets youtubeTitleSets) {
         double res = 0.0;
 
@@ -193,20 +213,20 @@ public class SongComparisons {
             res = Math.max(res, jaro_distance(spotifyArtist, youtubeTitlePreSeparatorToString));
 
             String youtubeTitlePreSeparatorUnhomoglyphToString = youtubeTitleSets.youtubeTitlePreSeparatorUnhomoglyph.toString();
-            if (res < CONFIDENCEINTERVAL) {
+            if (res < CONFIDENCE_INTERVAL) {
                 res = Math.max(res, jaro_distance(spotifyArtist, youtubeTitlePreSeparatorUnhomoglyphToString));
             }
 
-            if (res < CONFIDENCEINTERVAL) {
+            if (res < CONFIDENCE_INTERVAL) {
                 res = Math.max(res, levenshteinDistance(spotifyArtist, youtubeTitlePreSeparatorToString));
             }
 
-            if (res < CONFIDENCEINTERVAL) {
+            if (res < CONFIDENCE_INTERVAL) {
                 res = Math.max(res, levenshteinDistance(spotifyArtist, youtubeTitlePreSeparatorUnhomoglyphToString));
             }
         }
 
-        if (!youtubeTitleSets.identified || res < CONFIDENCEINTERVAL) {
+        if (!youtubeTitleSets.identified || res < CONFIDENCE_INTERVAL) {
             Set<String> youtubeSet = Arrays.stream(youtubeChannel.split("\\s+")).collect(Collectors.toSet());
             Set<String> spotifySet = Arrays.stream(spotifyArtist.split("\\s+")).collect(Collectors.toSet());
 
@@ -216,7 +236,7 @@ public class SongComparisons {
             res = Math.max(res, subSetPercentage(spotifySet, youtubeTitleSets.youtubeTitleSetPostSeparatorUnhomoglyph));
 
 
-            if (res < CONFIDENCEINTERVAL) {
+            if (res < CONFIDENCE_INTERVAL) {
                 res = Math.max(res, jaccardIndex(spotifySet, youtubeTitleSets.youtubeTitleSetPreSeparator));
                 res = Math.max(res, jaccardIndex(spotifySet, youtubeTitleSets.youtubeTitleSetPreSeparatorUnhomoglyph));
                 res = Math.max(res, jaccardIndex(spotifySet, youtubeTitleSets.youtubeTitleSetPostSeparator));
@@ -229,6 +249,12 @@ public class SongComparisons {
         return res;
     }
 
+    /**
+     * Compares the YouTube and Spotify runtimes
+     * @param youtubeRuntime YouTube video runtime in seconds
+     * @param spotifyRuntime Spotify track runtime in seconds
+     * @return the similarity between the runtimes as number between 0 and 1
+     */
     private double checkLength(int youtubeRuntime, int spotifyRuntime) {
         int longer = Math.max(youtubeRuntime, spotifyRuntime);
         int shorter = Math.min(youtubeRuntime, spotifyRuntime);
@@ -236,6 +262,11 @@ public class SongComparisons {
         return (double) shorter / longer;
     }
 
+    /**
+     * Parses a title from Spotify
+     * @param spotifyTitle title of Spotify track
+     * @return set containing all parsed words
+     */
     private Set<String> parseSpotifyTitle(String spotifyTitle) {
         Set<String> spotifyTitleSet = new HashSet<>();
         String[] spotifyTitleSplit = spotifyTitle.split("\\s+");
