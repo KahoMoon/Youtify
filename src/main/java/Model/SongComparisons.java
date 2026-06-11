@@ -49,6 +49,11 @@ public class SongComparisons {
             this.youtubeTitleSetPreSeparatorUnhomoglyph.addAll(this.youtubeTitleSetPostSeparatorUnhomoglyph);
             this.youtubeTitleSetPostSeparator = new HashSet<>();
             this.youtubeTitleSetPostSeparatorUnhomoglyph = new HashSet<>();
+
+            this.youtubeTitlePreSeparator.append(" ").append(youtubeTitlePostSeparator);
+            this.youtubeTitlePreSeparatorUnhomoglyph.append(" ").append(youtubeTitlePostSeparatorUnhomoglyph);
+            this.youtubeTitlePostSeparator = null;
+            this.youtubeTitlePostSeparatorUnhomoglyph = null;
         }
 
         /**
