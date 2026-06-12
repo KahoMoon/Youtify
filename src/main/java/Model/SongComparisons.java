@@ -136,6 +136,8 @@ public class SongComparisons {
 
     File RED_FLAG;
     File GREEN_FLAG;
+    FileWriter RED_FLAG_WRITER;
+    FileWriter GREEN_FLAG_WRITER;
     final double CONFIDENCE_INTERVAL = 0.8;
     final Set<String> RED_FLAG_WORDS = new HashSet<>(Arrays.asList("cover", "remix", "flip", "instrumental", "live", "acoustic", "ver", "version", "mashup", "edit", "slowed", "doomer", "nightcore"));
     final int RED_FLAG_LENGTH = 300;
@@ -149,6 +151,26 @@ public class SongComparisons {
 
         RED_FLAG = new File("Youtify RedFlags " + timestamp + ".txt");
         GREEN_FLAG = new File("Youtify GreenFlags " + timestamp + ".txt");
+
+        try {
+            RED_FLAG_WRITER = new FileWriter(RED_FLAG, true);
+            GREEN_FLAG_WRITER = new FileWriter(GREEN_FLAG, true);
+        } catch (IOException e) {
+            throw new RuntimeException("File could not be created.");
+        }
+    }
+
+    public void closeWriters() {
+        assert RED_FLAG != null;
+        assert GREEN_FLAG != null;
+        assert RED_FLAG_WRITER != null;
+        assert GREEN_FLAG_WRITER != null;
+        try {
+            RED_FLAG_WRITER.close();
+            GREEN_FLAG_WRITER.close();
+        } catch (IOException e) {
+            throw new AssertionError("This should never happen", e);
+        }
     }
 
     /**
@@ -167,19 +189,15 @@ public class SongComparisons {
 
         double res = titleSimilarity * artistSimilarity * lengthSimilarity;
 
-        FileWriter myWriter;
         if (res >= CONFIDENCE_INTERVAL) {
-            myWriter = new FileWriter(GREEN_FLAG, true);
-            myWriter.write(youtubeSongTitle + "\n" +
+            GREEN_FLAG_WRITER.write(youtubeSongTitle + "\n" +
                     youtubeChannel + "\n" +
                     youtubeSongLen + "\n");
         } else {
-            myWriter = new FileWriter(RED_FLAG, true);
-            myWriter.write(youtubeSongTitle + "\n" +
+            RED_FLAG_WRITER.write(youtubeSongTitle + "\n" +
                     youtubeChannel + "\n" +
                     youtubeSongLen + "\n");
         }
-        myWriter.close();
 
         return res;
     }
