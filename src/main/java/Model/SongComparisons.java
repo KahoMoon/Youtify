@@ -1,6 +1,5 @@
 package Model;
 import com.anyascii.AnyAscii;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -178,7 +177,7 @@ public class SongComparisons {
      * @param youtubeTitleSets object holding the parsed YouTube title
      * @return the probability the YouTube title and Spotify title refer to the same entity as a number between 0 and 1
      */
-    private double checkTitle(String youtubeTitle, String spotifyTitle, @NotNull YoutubeTitleSets youtubeTitleSets) {
+    private double checkTitle(String youtubeTitle, String spotifyTitle, YoutubeTitleSets youtubeTitleSets) {
         double res = 0.0;
 
         Set<String> spotifyTitleSet = parseSpotifyTitle(spotifyTitle);
@@ -210,7 +209,7 @@ public class SongComparisons {
      * @param youtubeTitleSets object holding a parsed YouTube title
      * @return the probability the YouTube channel refers to the Spotify artist as a number between 0 and 1
      */
-    private double checkArtist(String youtubeChannel, String spotifyArtist, @NotNull YoutubeTitleSets youtubeTitleSets) {
+    private double checkArtist(String youtubeChannel, String spotifyArtist, YoutubeTitleSets youtubeTitleSets) {
         double res = 0.0;
 
         if (youtubeTitleSets.identified) {
