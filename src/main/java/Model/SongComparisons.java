@@ -4,8 +4,8 @@ import com.anyascii.AnyAscii;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
-import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -143,8 +143,12 @@ public class SongComparisons {
     int CHECK_ARTIST_LIMIT = 2;   //the max number of artists that will be compared between the YouTube and Spotify tracks
 
     public SongComparisons() {
-        RED_FLAG = new File("Youtify RedFlags" + Instant.now() + ".txt");
-        GREEN_FLAG = new File("Youtify GreenFlags" + Instant.now() + ".txt");
+        String TIMESTAMP_FORMAT = "yyyyMMddHHmmss";
+        DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT);
+        String timestamp = LocalDateTime.now().format(DATETIME_FORMATTER);
+
+        RED_FLAG = new File("Youtify RedFlags " + timestamp + ".txt");
+        GREEN_FLAG = new File("Youtify GreenFlags " + timestamp + ".txt");
     }
 
     /**
