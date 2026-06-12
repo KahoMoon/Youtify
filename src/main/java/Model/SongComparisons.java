@@ -29,6 +29,11 @@ public class SongComparisons {
             this.youtubeTitleSetPreSeparatorUnhomoglyph = new HashSet<>();
             this.youtubeTitleSetPostSeparator = new HashSet<>();
             this.youtubeTitleSetPostSeparatorUnhomoglyph = new HashSet<>();
+
+            this.youtubeTitlePreSeparator = new StringBuilder();
+            this.youtubeTitlePreSeparatorUnhomoglyph = new StringBuilder();
+            this.youtubeTitlePostSeparator = new StringBuilder();
+            this.youtubeTitlePostSeparatorUnhomoglyph = new StringBuilder();
         }
 
         YoutubeTitleSets(String youtubeTitle) {
@@ -36,6 +41,11 @@ public class SongComparisons {
             this.youtubeTitleSetPreSeparatorUnhomoglyph = new HashSet<>();
             this.youtubeTitleSetPostSeparator = new HashSet<>();
             this.youtubeTitleSetPostSeparatorUnhomoglyph = new HashSet<>();
+
+            this.youtubeTitlePreSeparator = new StringBuilder();
+            this.youtubeTitlePreSeparatorUnhomoglyph = new StringBuilder();
+            this.youtubeTitlePostSeparator = new StringBuilder();
+            this.youtubeTitlePostSeparatorUnhomoglyph = new StringBuilder();
 
             parseYoutubeTitle(youtubeTitle);
         }
